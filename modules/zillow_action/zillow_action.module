@@ -1,0 +1,96 @@
+<?php
+/**
+ * @file
+ * This is the file description for Zillow Action module.
+ *
+ * In this more verbose, multi-line description, you can specify what this
+ * file does exactly. Make sure to wrap your documentation in column 78 so
+ * that the file can be displayed nicely in default-sized consoles.
+ */
+
+/**
+ * Implements hook_action_info().
+ */
+function zillow_action_action_info() {
+  return array(
+    'zillow_create_tour_action' => array(
+      'type' => 'system',
+      'label' => t('Create Tour'),
+      'configurable' => TRUE,
+      'triggers' => array('any'),
+	  'aggregate' => TRUE
+    ),
+  );
+}
+
+function zillow_create_tour_action_form($context) {
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => isset($context['title']) ? $context['title'] : '',
+    '#required' => TRUE,
+    '#description' => t('Please provide a name for your Tour'),
+  );
+  return $form;
+}
+
+function zillow_create_tour_action_submit($form, $form_state) {
+  return array('title' => $form_state['values']['title']);
+}
+
+/**
+ * Action function for action_example_basic_action.
+ *
+ * This action is not expecting any type of entity object, and can be used with
+ * any trigger type or any event.
+ *
+ * @param $entity
+ *   An optional entity object.
+ * @param $context
+ *   Array with parameters for this action: depends on the trigger.
+ *
+ * @see action_example_action_info()
+ */
+function zillow_create_tour_action(&$entity, $context = array()) {
+  //
+  // In this case we are ignoring the entity and the context. This case of
+  // action is useful when your action does not depend on the context, and
+  // the function must do something regardless the scope of the trigger.
+  // Simply announces that the action was executed using a message.
+   //dpm($entity);
+
+  // create a new tour node
+  $node = new stdClass();
+  // loop through the rows and setup the reference field
+	foreach($entity as $key) {
+	  $node->field_tour_open_ref['und'][]['target_id'] = $key->nid;
+	  //dpm($key);
+  }
+  if (empty($context['node'])) {
+    $context['node'] = $entity;
+  }
+  $context['title'] = token_replace(filter_xss_admin($context['title']), $context);
+  //dpm($context['title']);
+$node->nid            = NULL;
+  $node->title          = $context['title'];
+  $node->type           = 'tour';
+  $node->language       = LANGUAGE_NONE;
+  $node->created        = time();
+  $node->changed        = $node->created;
+  $node->status         = 1;         // Published?
+  $node->promote        = 0;         // Display on front page?
+  $node->sticky         = 0;         // Display top of page?
+  $node->format         = 0;         // Filtered HTML?
+  $node->revision       = 1;
+  // Save new node
+  node_object_prepare($node);
+  //echo "node prepare";
+  node_submit($node);
+  node_save($node);
+  //dpm($node);
+  drupal_goto("node/" . $node->nid);
+
+}
+
+
+

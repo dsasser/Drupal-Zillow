@@ -1,0 +1,81 @@
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
+/**
+* Implements hook_help.
+*
+* Displays help and module information.
+*
+* @param path
+*   Which path of the site we're using to display help
+* @param arg
+*   Array that holds the current path as returned from arg() function
+*/
+function zillow_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#zillow":
+      return '<p>'.  t("This is where the help would be, if there were any.") .'</p>';
+      break;
+  }
+}
+
+/**
+* Implements hook_menu().
+*/
+function zillow_menu() {
+  $items = array(); 
+  $items['start'] = array(
+    'title' => 'Start',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('zillow_searchform_wizard'),
+    'access callback' => TRUE,
+    'description' => 'Searching for stuff...',
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'zillow_wizard.form.inc',
+    'weight' => 9,
+  );
+
+
+
+
+  //$items['start'] = array(
+  //  'title' => 'Zillowed',
+  //  'description' => 'Configuration for zillow module',
+  //  'page callback' => 'drupal_get_form',
+  //  'page arguments' => array('zillow_wizard'),
+  //  'access callback' => TRUE,
+  //  'file' => 'zillow_wizard.inc',
+  //  'type' => MENU_NORMAL_ITEM,
+  //);
+  $items['menufun'] = array(
+    //title => t(Greeting),
+    'page callback' => 'menufun_hello',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+ 
+  return $items;
+}
+
+/**
+* Implements hook_theme().
+*/
+function zillow_theme() {
+  return array(
+    'open_node_form' => array(
+      'arguments' => array(
+          'form' => NULL,
+      ),
+      'template' => 'open-node-form',
+      'render element' => 'form',
+    ),
+  );
+}
+
+function zillow_node_view($node, $view_mode, $langcode){
+  //echo "hi";
+  //dpm($node);
+  
+}

@@ -1,0 +1,29 @@
+name = Zillow Action
+description = "The description of this module"
+
+; Core version (required)
+core = 7.x
+
+; Package name (see http://drupal.org/node/542202 for a list of names)
+package = custom
+
+; PHP version requirement (optional)
+; php = 5.2
+
+; Loadable code files
+; files[] = zillow_action.module
+; files[] = zillow_action.admin.inc
+; files[] = zillow_action.class.inc
+
+; Module dependencies
+; dependencies[] = mymodule
+; dependencies[] = theirmodule (1.2)
+; dependencies[] = anothermodule (>=2.4)
+; dependencies[] = views (3.x)
+
+; Configuration page
+; configure = admin/config/zillow_action
+
+
+; For further information about configuration options, see
+; - http://drupal.org/node/542202

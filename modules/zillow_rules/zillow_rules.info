@@ -1,0 +1,29 @@
+name = Zillow Rules
+description = "Rules Integration for the Zillow Module."
+
+; Core version (required)
+core = 7.x
+
+; Package name (see http://drupal.org/node/542202 for a list of names)
+package = custom
+
+; PHP version requirement (optional)
+; php = 5.2
+
+; Loadable code files
+; files[] = untitled.module
+; files[] = untitled.admin.inc
+; files[] = untitled.class.inc
+
+; Module dependencies
+dependencies[] = zillow
+dependencies[] = rules
+dependencies[] = views (3.x)
+
+; Configuration page
+; configure = admin/config/zillow/rules
+
+; For further information about configuration options, see
+; - http://drupal.org/node/542202
+
+project = "zillow_rules"
