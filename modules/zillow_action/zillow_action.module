@@ -57,14 +57,21 @@ function zillow_create_tour_action(&$entity, $context = array()) {
   // action is useful when your action does not depend on the context, and
   // the function must do something regardless the scope of the trigger.
   // Simply announces that the action was executed using a message.
-   //dpm($entity);
-
+  $count = 0;
   // create a new tour node
   $node = new stdClass();
-  // loop through the rows and setup the reference field
+  // loop through the rows and setup the reference and geo fields
 	foreach($entity as $key) {
 	  $node->field_tour_open_ref['und'][]['target_id'] = $key->nid;
-	  //dpm($key);
+	  $node->field_tour_map['und'][$count]['wkt'] = $key->field_prop_geo['und'][0]['wkt'];
+	  $node->field_tour_map['und'][$count]['geo_type'] = $key->field_prop_geo['und'][0]['geo_type'];
+	  $node->field_tour_map['und'][$count]['lat'] = $key->field_prop_geo['und'][0]['lat'];
+	  $node->field_tour_map['und'][$count]['lon'] = $key->field_prop_geo['und'][0]['lon'];
+	  $node->field_tour_map['und'][$count]['left'] = $key->field_prop_geo['und'][0]['left'];
+	  $node->field_tour_map['und'][$count]['top'] = $key->field_prop_geo['und'][0]['top'];
+	  $node->field_tour_map['und'][$count]['right'] = $key->field_prop_geo['und'][0]['right'];
+	  $node->field_tour_map['und'][$count]['bottom'] = $key->field_prop_geo['und'][0]['bottom'];
+	  $count++;
   }
   if (empty($context['node'])) {
     $context['node'] = $entity;
