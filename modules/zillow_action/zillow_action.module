@@ -73,9 +73,27 @@ function zillow_create_tour_action(&$entity, $context = array()) {
 	  $node->field_tour_map['und'][$count]['bottom'] = $key->field_prop_geo['und'][0]['bottom'];
 	  $count++;
   }
+
+  // get the directions from Google
+/*
+	  	if (isset($node->field_tour_map['und'][1])) { //we have at least two coordinates
+			$ch = curl_init("http://maps.googleapis.com/maps/api/directions/json?origin=45.4862,-122.374&destination=44.9792,-123.015&waypoints=44.9798,-123.015&sensor=false");
+	        curl_setopt($ch, CURLOPT_HEADER, 0);
+	        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	        $output = curl_exec($ch);      
+	        curl_close($ch);
+	        //dpm($output);
+			$node->field_tour_map_text['und'][0]['value'] = $output;
+			
+			//dpm(drupal_json_decode($output));
+		}
+*/		
+
+  //set the entity type
   if (empty($context['node'])) {
     $context['node'] = $entity;
   }
+  //set the title based on use input
   $context['title'] = token_replace(filter_xss_admin($context['title']), $context);
   //dpm($context['title']);
 $node->nid            = NULL;
@@ -95,6 +113,8 @@ $node->nid            = NULL;
   node_submit($node);
   node_save($node);
   //dpm($node);
+
+
   drupal_goto("node/" . $node->nid);
 
 }

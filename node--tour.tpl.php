@@ -80,25 +80,10 @@
  * @see zen_preprocess_node()
  * @see template_process()
  */
-
-dpm($node);
 ?>
-
-
-	<?php
-	        $ch = curl_init("http://maps.googleapis.com/maps/api/directions/json?origin=45.4862,-122.374&destination=44.9792,-123.015&waypoints=44.9798,-123.015&sensor=false");
-	        curl_setopt($ch, CURLOPT_HEADER, 0);
-	        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	        $output = curl_exec($ch);      
-	        curl_close($ch);
-	        //dpm($output);
-			dpm(drupal_json_decode($output));
-			
-	?>
-	
 <h1>node--tour.tpl.php</h1>
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
-
+  <div id="directions-panel"></div>
   <?php print $user_picture; ?>
 
   <?php print render($title_prefix); ?>

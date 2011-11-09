@@ -75,9 +75,24 @@ function zillow_theme() {
 }
 
 function zillow_node_view($node, $view_mode, $langcode){
-  //echo "hi";
-  //dpm($node);
-  
+  	if ($node->type === 'tour') {
+		$my_settings = array(
+		  'basepath' => 'FUCKKKKk',
+		  'animation_effect' => array(
+		  		'test' => 'THIS!!!',
+				'test2' => 'that!!'
+		  ),
+		  'location1' => array(
+		  	'lat' => 100.1,
+			'lon' => 45
+		  )
+		 );
+
+		$path = drupal_get_path('module', 'zillow');
+		drupal_add_js($path . '/js/zillow.js', array('weight' => 1));
+		drupal_add_js(array('zillow' => $my_settings), 'setting');
+	}
+
 }
 
 /**
