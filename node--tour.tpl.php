@@ -81,9 +81,12 @@
  * @see template_process()
  */
 ?>
-<h1>node--tour.tpl.php</h1>
+	
+<div id="map_canvas" style="float:left; width: 560px; height: 400px;"></div>
+<div id="directionsPanel" style="float:right; width: 40%;"></div>
+
+<div><h1>node--tour.tpl.php</h1></div>
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
-  <div id="directions-panel"></div>
   <?php print $user_picture; ?>
 
   <?php print render($title_prefix); ?>

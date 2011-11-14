@@ -76,18 +76,23 @@ function zillow_theme() {
 
 function zillow_node_view($node, $view_mode, $langcode){
   	if ($node->type === 'tour') {
+	   // dpm($node);
 		$my_settings = array(
-		  'basepath' => 'FUCKKKKk',
-		  'animation_effect' => array(
-		  		'test' => 'THIS!!!',
-				'test2' => 'that!!'
+		  'start_address' => array(
+		  	'lat' => $node->field_tour_start_address['und'][0]['lat'],
+			'lon' => $node->field_tour_start_address['und'][0]['lon'],
 		  ),
-		  'location1' => array(
-		  	'lat' => 100.1,
-			'lon' => 45
-		  )
+		  'end_address' => array(
+		  	'lat' => $node->field_tour_end_address['und'][0]['lat'],
+			'lon' => $node->field_tour_end_address['und'][0]['lon'],
+		  ),
+		  'waypoints' => array(
+			$node->field_tour_map['und'],
+		  ),
 		 );
-
+				//dpm($my_settings);
+		//add google api
+		drupal_add_js('http://maps.googleapis.com/maps/api/js?sensor=false', 'external');
 		$path = drupal_get_path('module', 'zillow');
 		drupal_add_js($path . '/js/zillow.js', array('weight' => 1));
 		drupal_add_js(array('zillow' => $my_settings), 'setting');

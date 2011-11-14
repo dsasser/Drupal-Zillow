@@ -31,11 +31,29 @@ function zillow_create_tour_action_form($context) {
     '#required' => TRUE,
     '#description' => t('Please provide a name for your Tour'),
   );
+  $form['start'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Start Address'),
+    '#default_value' => isset($context['start']) ? $context['start'] : '',
+    '#required' => TRUE,
+    '#description' => t('Please provide your starting address. Example: <strong>Portland, OR</strong>'),
+  );
+  $form['end'] = array(
+    '#type' => 'textfield',
+    '#title' => t('End Address'),
+    '#default_value' => isset($context['end']) ? $context['end'] : '',
+    '#required' => TRUE,
+    '#description' => t('Please provide your ending address. Example: <strong>Portland, OR</strong>'),
+  );
   return $form;
 }
 
 function zillow_create_tour_action_submit($form, $form_state) {
-  return array('title' => $form_state['values']['title']);
+  return array(
+	'title' => $form_state['values']['title'],
+	'start' => $form_state['values']['start'],
+	'end'	=> $form_state['values']['end'],
+  );
 }
 
 /**
@@ -74,39 +92,84 @@ function zillow_create_tour_action(&$entity, $context = array()) {
 	  $count++;
   }
 
-  // get the directions from Google
-/*
-	  	if (isset($node->field_tour_map['und'][1])) { //we have at least two coordinates
-			$ch = curl_init("http://maps.googleapis.com/maps/api/directions/json?origin=45.4862,-122.374&destination=44.9792,-123.015&waypoints=44.9798,-123.015&sensor=false");
+  // geocode using Google, the Start Address provided by the Realtor
+
+			$starturl = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($context['start'])."&sensor=false";
+			
+			//dpm($starturl);
+			$ch = curl_init($starturl);
 	        curl_setopt($ch, CURLOPT_HEADER, 0);
 	        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	        $output = curl_exec($ch);      
-	        curl_close($ch);
+			curl_close($ch);
 	        //dpm($output);
-			$node->field_tour_map_text['und'][0]['value'] = $output;
 			
-			//dpm(drupal_json_decode($output));
-		}
-*/		
+			$output = drupal_json_decode($output); //converts JSON to an Array
+			
+			//put start address in geofield
+			$start_lat = $output['results'][0]['geometry']['location']['lat'];
+			$start_lng = $output['results'][0]['geometry']['location']['lng'];
+			if (isset($start_lat) && isset($start_lng)) {
+		   	 $node->field_tour_start_address['und'][0]['wkt'] = "POINT ($start_lng $start_lat)";
+		   	 $node->field_tour_start_address['und'][0]['geo_type'] = "POINT";
+		   	 $node->field_tour_start_address['und'][0]['lat'] = $start_lat;
+		   	 $node->field_tour_start_address['und'][0]['lon'] = $start_lng;
+		   	 $node->field_tour_start_address['und'][0]['left'] = $start_lng;
+		   	 $node->field_tour_start_address['und'][0]['top'] = $start_lat;
+		   	 $node->field_tour_start_address['und'][0]['right'] = $start_lng;
+		   	 $node->field_tour_start_address['und'][0]['bottom'] = $start_lat;
+		   	 //dpm($output);
+	  		}
+		    //	geocode using Google, the Start Address provided by the Realtor
+			$endurl = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($context['end'])."&sensor=false";
+			//dpm($endurl);
+			$ch2 = curl_init($endurl);
+	        curl_setopt($ch2, CURLOPT_HEADER, 0);
+	        curl_setopt($ch2, CURLOPT_RETURNTRANSFER, 1);
+	        $output2 = curl_exec($ch2);      
+			curl_close($ch2);
+	        //dpm($output);
+			
+			$output2 = drupal_json_decode($output2); //converts JSON to an Array
+			//put end address in geofield
+			$end_lat = $output2['results'][0]['geometry']['location']['lat'];
+			$end_lng = $output2['results'][0]['geometry']['location']['lng'];
+			if (isset($end_lat) && isset($end_lng)) {
+		   	 $node->field_tour_end_address['und'][0]['wkt'] = "POINT ($end_lng $end_lat)";
+		   	 $node->field_tour_end_address['und'][0]['geo_type'] = "POINT";
+		   	 $node->field_tour_end_address['und'][0]['lat'] = $end_lat;
+		   	 $node->field_tour_end_address['und'][0]['lon'] = $end_lng;
+		   	 $node->field_tour_end_address['und'][0]['left'] = $end_lng;
+		   	 $node->field_tour_end_address['und'][0]['top'] = $end_lat;
+		   	 $node->field_tour_end_address['und'][0]['right'] = $end_lng;
+		   	 $node->field_tour_end_address['und'][0]['bottom'] = $end_lat;
+		   	 //dpm($output);
+			}
+
+		
 
   //set the entity type
   if (empty($context['node'])) {
     $context['node'] = $entity;
   }
-  //set the title based on use input
+  //filter the user input for xss
   $context['title'] = token_replace(filter_xss_admin($context['title']), $context);
-  //dpm($context['title']);
-$node->nid            = NULL;
-  $node->title          = $context['title'];
-  $node->type           = 'tour';
-  $node->language       = LANGUAGE_NONE;
-  $node->created        = time();
-  $node->changed        = $node->created;
-  $node->status         = 1;         // Published?
-  $node->promote        = 0;         // Display on front page?
-  $node->sticky         = 0;         // Display top of page?
-  $node->format         = 0;         // Filtered HTML?
-  $node->revision       = 1;
+  $context['start'] = token_replace(filter_xss_admin($context['start']), $context);
+  $context['end'] 	= token_replace(filter_xss_admin($context['end']), $context);
+  //setup the node with the rest of the data values
+  $node->field_tour_start_text['und'][0]['value'] 	= $context['start'];
+  $node->field_tour_end_text['und'][0]['value'] 	= $context['end'];
+  $node->nid            							= NULL;
+  $node->title          							= $context['title'];
+  $node->type           							= 'tour';
+  $node->language       							= LANGUAGE_NONE;
+  $node->created        							= time();
+  $node->changed        							= $node->created;
+  $node->status         							= 1;         // Published?
+  $node->promote        							= 0;         // Display on front page?
+  $node->sticky        								= 0;         // Display top of page?
+  $node->format         							= 0;         // Filtered HTML?
+  $node->revision       							= 1;
   // Save new node
   node_object_prepare($node);
   //echo "node prepare";
