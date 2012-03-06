@@ -1,0 +1,34 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the field_example module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ *
+ * Defines the database schema of the field, using the format used by the
+ * Schema API.
+ *
+ *
+ * All implementations of hook_field_schema() must be in the module's
+ * .install file.
+ *
+ * @see http://drupal.org/node/146939
+ * @see schemaapi
+ * @see hook_field_schema()
+ * @ingroup field_example
+ */
+function zillow_field_field_schema($field) {
+  $columns = array(
+    'address' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+    'city' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+  );
+  $indexes = array(
+    'zfid' => array('zfid'),
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes,
+  );
+}

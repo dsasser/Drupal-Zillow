@@ -1,0 +1,30 @@
+name = Zillow Field
+description = "Adds a <strong>property</strong> field that pulls from the Zillow API. Comes with an <br >
+               API that may suck pretty bad, or may rock, I didn't write it."
+
+; Core version (required)
+core = 7.x
+
+; Package name (see http://drupal.org/node/542202 for a list of names)
+package = custom
+
+; PHP version requirement (optional)
+; php = 5.2
+
+; Loadable code files
+files[] = zillow_field.module
+files[] = zillow_field.admin.inc
+; files[] = zillow_field.class.inc
+
+; Module dependencies
+; dependencies[] = zillow
+; dependencies[] = theirmodule (1.2)
+; dependencies[] = anothermodule (>=2.4)
+; dependencies[] = views (3.x)
+
+; Configuration page
+configure = admin/config/zillow_field/settings
+
+
+; For further information about configuration options, see
+; - http://drupal.org/node/542202

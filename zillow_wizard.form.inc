@@ -507,9 +507,14 @@ include('sites/all/libraries/pillow.php'); //include the pillow library (zillow 
   $pf = new Pillow_Factory( $zillow_api_key );
   //$pf will be an array with 1 or more Pillow_Property objects. Exact
   // matches will be found at $pf[0]
-  $form_state['property_info'] = $pf->findExactProperty(
-    $address,$city_state_zip,TRUE
-  );
+
+
+	$variable = $pf->findExactProperty(
+	    $address,$city_state_zip,TRUE
+	  );
+	dpm($variable);
+  $form_state['property_info'] = $variable;
+
   //dpm($form_state['property_info']);
   //get rid of the nested objects we dont need
   unset($form_state['property_info']->links);

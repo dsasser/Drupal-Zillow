@@ -1,0 +1,217 @@
+<?php
+/**
+ * @file
+ * This is the file description for Zillow Field module.
+ *
+ * In this more verbose, multi-line description, you can specify what this
+ * file does exactly. Make sure to wrap your documentation in column 78 so
+ * that the file can be displayed nicely in default-sized consoles.
+ */
+
+function zillow_field_addressfield_generate() {
+	
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function zillow_field_menu() {
+    $items = array();
+	$items['admin/config/zillow_field/settings'] = array(
+		'title' => 'Zillow Field settings',
+		'description' => 'Configure Zillow Field.',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('zillow_field_admin_settings'),
+		'access arguments' => array('administer site configuration'),
+		'type' => MENU_NORMAL_ITEM,
+		'file' => '/includes/zillow_field.admin.inc',
+	);
+    return $items;
+}
+
+/***************************************************************
+ * Field Type API hooks
+ ***************************************************************/
+
+/**
+ * Implements hook_field_info().
+ *
+ * Provides the description of the field.
+ */
+function zillow_field_field_info() {
+  return array(
+    // We name our field as the associative name of the array.
+    'zillow_field' => array(
+      'label' => t('Zillow Property Field'),
+      'description' => t('Demonstrates a field composed of an RGB color.'),
+      'default_widget' => 'zillow_field_text',
+      'default_formatter' => 'zillow_field_simple_text',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ *
+ * This hook gives us a chance to validate content that's in our
+ * field. We're really only interested in the $items parameter, since
+ * it holds arrays representing content in the field we've defined.
+ * We want to verify ...
+ * @see zillow_field_field_widget_error()
+ */
+function zillow_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+	dpm($items);
+  foreach ($items as $delta => $item) {
+    if (!empty($item['zfield'])) {
+      if (! preg_match('@^#[0-9a-f]{6}$@', $item['zfield'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'zillow_field_invalid',
+          'message' => t('Color must be in the HTML format #abcdef.'),
+        );
+      }
+    }
+  }	
+}
+
+/**
+ * Implements hook_field_is_empty().
+ *
+ * hook_field_is_emtpy() is where Drupal asks us if this field is empty.
+ * Return TRUE if it does not contain data, FALSE if it does. This lets
+ * the form API flag an error when required fields are empty.
+ */
+function zillow_field_field_is_empty($item, $field) {
+  return empty($item['zfid']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ *
+ * We need to tell Drupal about our formatters
+ *
+ * @see zillow_field_field_formatter_view()
+ */
+function zillow_field_field_formatter_info() {
+  return array(
+    // This formatter just displays the hex value in the color indicated.
+    'zillow_field_simple_text' => array(
+      'label' => t('Simple text-based formatter'),
+      'field types' => array('zillow_field'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ *
+ * @see zillow_field_field_formatter_info()
+ */
+function zillow_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  switch ($display['type']) {
+    // This formatter simply outputs the field as text
+    case 'zillow_field_simple_text':
+      foreach ($items as $delta => $item) {
+		dpm($item['zfield']);
+        $element[$delta] = array(
+          // We create a render array to produce the desired markup,
+          // "<p style="color: #hexcolor">The color code ... #hexcolor</p>".
+          // See theme_html_tag().
+          '#type' => 'html_tag',
+          '#tag' => 'p',
+          '#value' => t('The data in this field is @data', array('@data' => $item['zfield'])),
+        );
+      }
+      break;
+  }
+  return $element;
+}
+
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ *
+ * These widget types will eventually show up in hook_field_widget_form,
+ * where we will have to flesh them out.
+ *
+ * @see zillow_field_field_widget_form()
+ */
+function zillow_field_field_widget_info() {
+  return array(
+    'zillow_field_text' => array(
+      'label' => t('Simple text'),
+      'field types' => array('zillow_field'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ *
+ * hook_widget_form() is where Drupal tells us to create form elements for
+ * our field's widget.
+ *
+ */
+function zillow_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  //just set a text field for now
+ // @todo:add other fields
+  $value = isset($items[$delta]['zfield']) ? $items[$delta]['zfield'] : '';
+  dpm($element);
+  dpm($delta);
+  $widget = $element;
+  $widget['#delta'] = $delta;
+
+  switch ($instance['widget']['type']) {
+    case 'zillow_field_text':
+      $widget += array(
+        '#type' => 'textfield',
+        '#default_value' => $value,
+        // Allow a slightly larger size that the field length to allow for some
+        // configurations where all characters won't fit in input field.
+        '#size' => 7,
+        '#maxlength' => 7,
+        '#element_validate' => array('zillow_field_text_validate'),
+      );
+	$widget['caption'] = array(
+	  '#type' => 'textfield',
+	  '#title' => 'Caption',
+	  '#delta' => $delta,
+	);
+      break;
+  }
+
+  $element['zfield'] = $widget;
+  return $element;
+}
+
+/**
+ * Validate the individual fields and then convert them into a single HTML RGB
+ * value as text.
+ */
+function zillow_field_text_validate($element, &$form_state) {
+// @todo actually validate the field
+}
+
+
+/**
+ * Implements hook_field_widget_error().
+ *
+ * hook_field_widget_error() lets us figure out what to do with errors
+ * we might have generated in hook_field_validate(). Generally, we'll just
+ * call form_error().
+ *
+ * @see zillow_field_field_validate()
+ * @see form_error()
+ */
+function zillow_field_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'zillow_field_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
+
+

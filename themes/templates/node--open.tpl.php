@@ -80,12 +80,10 @@
  * @see zen_preprocess_node()
  * @see template_process()
  */
+//dpm($content);
 ?>
-	
-<div id="map_canvas" style="float:left; width: 560px; height: 400px;"></div>
-<div id="directionsPanel" style="float:right; width: 40%;"></div>
 
-<div><h1>node--tour.tpl.php</h1></div>
+<div><h1>node--open.tpl.php</h1></div>
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <?php print $user_picture; ?>
 
@@ -94,10 +92,6 @@
     <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
   <?php endif; ?>
   <?php print render($title_suffix); ?>
-
-  <?php if ($unpublished): ?>
-    <div class="unpublished"><?php print t('Unpublished'); ?></div>
-  <?php endif; ?>
 
   <?php if ($display_submitted): ?>
     <div class="submitted">
@@ -110,6 +104,9 @@
       // We hide the comments and links now so that we can render them later.
       hide($content['comments']);
       hide($content['links']);
+	  // hide the User ref field
+	  //hide($content['field_host']);
+	  //render($content['field_host']);
       print render($content);
     ?>
   </div>
@@ -117,5 +114,7 @@
   <?php print render($content['links']); ?>
 
   <?php print render($content['comments']); ?>
+
+  <?php //print render($node->field_host[0]['entity']->field_user_agent_name['und'][0]['safe_value']); ?>
 
 </div><!-- /.node -->

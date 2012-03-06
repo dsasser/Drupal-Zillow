@@ -1,7 +1,7 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
 
 /**
 * Implements hook_help.
@@ -36,26 +36,24 @@ function zillow_menu() {
     'file' => 'zillow_wizard.form.inc',
     'weight' => 9,
   );
-
-
-
-
-  //$items['start'] = array(
-  //  'title' => 'Zillowed',
-  //  'description' => 'Configuration for zillow module',
-  //  'page callback' => 'drupal_get_form',
-  //  'page arguments' => array('zillow_wizard'),
-  //  'access callback' => TRUE,
-  //  'file' => 'zillow_wizard.inc',
-  //  'type' => MENU_NORMAL_ITEM,
-  //);
-  $items['menufun'] = array(
-    //title => t(Greeting),
-    'page callback' => 'menufun_hello',
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
+  $items['user/%user/tours'] = array(
+	'title' => 'Tours',
+	'description' => 'The description of the menu item. It is used as title attribute and on the administration overview page.',
+	'page callback' => 'my_tours',
+	'page arguments' => array('form_id'),
+	'access callback' => TRUE,
+	'type' => MENU_LOCAL_TASK,
+	//'modal' => TRUE, // This line is where the magic happens.
   );
- 
+  $items['user/%user/properties'] = array(
+	'title' => 'Properties',
+	'description' => 'The description of the menu item. It is used as title attribute and on the administration overview page.',
+	'page callback' => 'my_props',
+	'page arguments' => array('form_id'),
+	'access callback' => TRUE,
+	'type' => MENU_LOCAL_TASK,
+	//'modal' => TRUE, // This line is where the magic happens.
+  );
   return $items;
 }
 
@@ -75,6 +73,7 @@ function zillow_theme() {
 }
 
 function zillow_node_view($node, $view_mode, $langcode){
+
   	if ($node->type === 'tour') {
 	   // dpm($node);
 		$my_settings = array(
@@ -100,9 +99,27 @@ function zillow_node_view($node, $view_mode, $langcode){
 
 }
 
+
+
+/*
+ * this function exists to provide a list of tours to the user account page
+*/
+function my_tours(){
+	return t("List of tours goes here");
+}
+
+/*
+ * this function exists to provide a list of properties to the user account page
+*/
+function my_props(){
+	return t("List of properties goes here");
+}
+
 /**
  * Implements hook_theme_registry_alter()
+ * This tells drupal that our module has theme templates
 **/
+
 function zillow_theme_registry_alter(&$theme_registry) {
   $mod_path = drupal_get_path('module', 'zillow');
   $theme_registry_copy = $theme_registry;       // munge on a copy
